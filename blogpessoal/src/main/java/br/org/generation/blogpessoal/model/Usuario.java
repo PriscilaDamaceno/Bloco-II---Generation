@@ -17,6 +17,8 @@ import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import io.swagger.annotations.ApiModelProperty;
+
 @Entity
 @Table(name = "tb_usuarios")
 public class Usuario {
@@ -25,19 +27,20 @@ public class Usuario {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
-	@NotNull(message = "O atributo Nome é Obrigatório!")
+	@NotNull(message = "O Nome é Obrigatório!")
 	private String nome;
 
-	@NotNull(message = "O atributo Usuário é Obrigatório!")
+	@ApiModelProperty(example = "email@email.com.br")
+	@NotNull(message = "O Usuário é Obrigatório!")
 	private String usuario;
 
-	@NotNull(message = "O atributo Senha é Obrigatória!")
+	@NotNull(message = "A Senha é Obrigatória!")
 	@Size(min = 8, message = "A Senha deve ter no mínimo 8 caracteres")
 	private String senha;
 	
-	@Column(name = "data_nascimento")
-	@JsonFormat(pattern = "yyyy-MM-dd")
-	@NotNull(message = "O atributo Data de Nascimento é Obrigatório!")
+	@Column(name = "dt_nascimento")
+	@JsonFormat(pattern="yyyy-MM-dd")
+    @NotNull(message = "O atributo Data de Nascimento é Obrigatório!")
 	private LocalDate dataNascimento;
 
 	@OneToMany(mappedBy = "usuario", cascade = CascadeType.REMOVE)
@@ -46,23 +49,19 @@ public class Usuario {
 
 	
 	public Usuario(long id, String nome, String usuario, String senha, LocalDate dataNascimento) {
-		
 		this.id = id;
 		this.nome = nome;
 		this.usuario = usuario;
 		this.senha = senha;
 		this.dataNascimento = dataNascimento;
-		
 	}
 
+	public Usuario() {	}
 	
-	public Usuario() { }
-	
-
 	public long getId() {
 		return id;
 	}
-
+	
 	public void setId(long id) {
 		this.id = id;
 	}
@@ -90,9 +89,9 @@ public class Usuario {
 	public void setSenha(String senha) {
 		this.senha = senha;
 	}
-
+	
 	public LocalDate getDataNascimento() {
-		return dataNascimento;
+		return this.dataNascimento;
 	}
 
 	public void setDataNascimento(LocalDate dataNascimento) {

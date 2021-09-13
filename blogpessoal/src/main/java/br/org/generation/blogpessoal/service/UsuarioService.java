@@ -22,23 +22,31 @@ public class UsuarioService {
 
 	@Autowired
 	private UsuarioRepository usuarioRepository;
-	
+
 	public List<Usuario> listarUsuarios(){
 
 		return usuarioRepository.findAll();
 
 	}
+
+	public Optional<Usuario> buscarUsuarioId(long id){
+
+		return usuarioRepository.findById(id);
+
+	}
 	
-	public Optional<Usuario> cadastrarUsuario(Usuario usuario) {
-
-		if (usuarioRepository.findByUsuario(usuario.getUsuario()).isPresent())
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O Usuário já existe!", null);
-
-		int idade = Period.between(usuario.getDataNascimento(), LocalDate.now()).getYears();
-
-		if (idade < 18)
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O Usuário é menor de idade!", null);
+	public Optional <Usuario> cadastrarUsuario(Usuario usuario) {
 		
+		if(usuarioRepository.findByUsuario(usuario.getUsuario()).isPresent())
+			throw new ResponseStatusException(
+				HttpStatus.BAD_REQUEST, "Usuário já existe!", null);
+		
+		 int idade = Period.between(usuario.getDataNascimento(), LocalDate.now()).getYears();
+		
+		 if(idade < 18)
+			throw new ResponseStatusException(
+						HttpStatus.BAD_REQUEST, "Usuário menor de 18 anos", null);
+
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
 		String senhaEncoder = encoder.encode(usuario.getSenha());
@@ -48,30 +56,43 @@ public class UsuarioService {
 	
 	}
 
-	public Optional<Usuario> atualizarUsuario(Usuario usuario) {
+	
+	public Optional <Usuario> atualizarUsuario(Usuario usuario){
 
-		if (usuarioRepository.findById(usuario.getId()).isPresent()) {
+		if(usuarioRepository.findById(usuario.getId()).isPresent()) {
+			 
+			Optional<Usuario> buscaUsuario = usuarioRepository.findByUsuario(usuario.getUsuario());
 			
+			if( buscaUsuario.isPresent() ){
+
+				if(buscaUsuario.get().getId() != usuario.getId())
+					throw new ResponseStatusException(
+						HttpStatus.BAD_REQUEST, "Usuário já existe!", null);
+			}
+
 			int idade = Period.between(usuario.getDataNascimento(), LocalDate.now()).getYears();
-	
-			if (idade < 18)
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O Usuário é menor de idade!", null);
 			
+			if(idade < 18)
+				throw new ResponseStatusException(
+					HttpStatus.BAD_REQUEST, "Usuário menor de 18 anos", null);
+					
 			BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-	
+			
 			String senhaEncoder = encoder.encode(usuario.getSenha());
 			usuario.setSenha(senhaEncoder);
-	
+			
 			return Optional.of(usuarioRepository.save(usuario));
 		
 		}else {
-			
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado!", null);
+
+			throw new ResponseStatusException(
+					HttpStatus.NOT_FOUND, "Usuário não encontrado!", null);
 			
 		}
+		
 	}
-
-	public Optional<UsuarioLogin> autenticarUsuario(Optional<UsuarioLogin> usuarioLogin) {
+	
+	public Optional<UsuarioLogin> logarUsuario(Optional<UsuarioLogin> usuarioLogin) {
 
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		Optional<Usuario> usuario = usuarioRepository.findByUsuario(usuarioLogin.get().getUsuario());
@@ -83,7 +104,7 @@ public class UsuarioService {
 				byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("US-ASCII")));
 				String authHeader = "Basic " + new String(encodedAuth);
 
-				usuarioLogin.get().setId(usuario.get().getId());
+				usuarioLogin.get().setId(usuario.get().getId());				
 				usuarioLogin.get().setNome(usuario.get().getNome());
 				usuarioLogin.get().setSenha(usuario.get().getSenha());
 				usuarioLogin.get().setToken(authHeader);
@@ -93,7 +114,8 @@ public class UsuarioService {
 			}
 		}
 		
-		throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "O Usuário ou Senha Inválidos!", null);
+		throw new ResponseStatusException(
+				HttpStatus.UNAUTHORIZED, "Usuário ou senha inválidos!", null);
 	}
 
 }

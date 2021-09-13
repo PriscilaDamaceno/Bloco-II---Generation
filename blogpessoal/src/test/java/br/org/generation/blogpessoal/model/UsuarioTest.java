@@ -20,48 +20,44 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class UsuarioTest {
-    
-    public Usuario usuario;
-    public Usuario usuarioErro = new Usuario();
 
+	public Usuario usuario;
+	public Usuario usuarioNulo = new Usuario();
+	
 	@Autowired
-	private  ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+	private ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 	
 	Validator validator = factory.getValidator();
-
+	
 	@BeforeEach
 	public void start() {
-
+		
 		LocalDate data = LocalDate.parse("2000-07-22", DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 		usuario = new Usuario(0L, "João da Silva", "joao@email.com.br", "13465278", data);
-
 	}
-
+	
 	@Test
 	@DisplayName("✔ Valida Atributos Não Nulos")
 	void testValidaAtributos() {
-
+		
 		Set<ConstraintViolation<Usuario>> violacao = validator.validate(usuario);
 		
 		System.out.println(violacao.toString());
-
+		
 		assertTrue(violacao.isEmpty());
-	}
-    
-    @Test
-	@DisplayName("✖ Não Valida Atributos Nulos")
-	void  testNaoValidaAtributos() {
-
-		Set<ConstraintViolation<Usuario>> violacao = validator.validate(usuarioErro);
-		System.out.println(violacao.toString());
-
-		assertFalse(violacao.isEmpty());
-	}
-
-	private void assertFalse(boolean empty) {
-		// TODO Auto-generated method stub
 		
 	}
 
+	@Test
+	@DisplayName("✖ Não Valida Atributos Nulos")
+	void testNaoValidaAtributos() {
+		
+		Set<ConstraintViolation<Usuario>> violacao = validator.validate(usuarioNulo);
+		
+		System.out.println(violacao.toString());
+		
+		assertTrue(violacao.isEmpty());
+		
+	}
+	
 }
-
