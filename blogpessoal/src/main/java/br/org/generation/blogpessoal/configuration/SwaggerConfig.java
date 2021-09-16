@@ -43,7 +43,7 @@ public class SwaggerConfig {
 			.description("Projeto API Spring - Blog Pessoal")
 			.version("1.0.0")
 			.license("Apache License Version 2.0")
-			.licenseUrl("https://github.com/rafaelq80")
+			.licenseUrl("https://github.com/PriscilaDamaceno")
 			.contact(contact())
 			.build();
 	}
